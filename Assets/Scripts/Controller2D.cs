@@ -9,7 +9,7 @@ namespace ChildOfAtlantis.Mechanics
     public class Controller2D : RayCastController
     {
         //Max Slope AngleIn Degrees
-        public float maxSlope = 80;
+        public float maxSlope = 60;
         [HideInInspector]
         public Vector2 playerInput;
         protected override void Start()
@@ -30,17 +30,19 @@ namespace ChildOfAtlantis.Mechanics
             collisionInfo.reset();
             collisionInfo.lastVelocity = moveVector;
 
-            if (moveVector.y < 0)
+            if (moveVector.y < 0.0f)
             {
                 DescendSlope(ref moveVector);
             }
-            if (moveVector.x != 0)
+            if (moveVector.x != 0.0f)
             {
                 collisionInfo.faceDir = Mathf.Sign(moveVector.x);
             }
-            HorizontalCollisions(ref moveVector);
-
-            if (moveVector.y != 0)
+            if(moveVector.x != 0.0f)
+            {
+                HorizontalCollisions(ref moveVector);
+            }
+            if(moveVector.y != 0.0f)
             {
                 VerticalCollisions(ref moveVector);
             }
@@ -67,10 +69,6 @@ namespace ChildOfAtlantis.Mechanics
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, collisionMask);
                 if (hit)
                 {
-                    if (hit.distance == 0 || hit.transform.gameObject.layer == 10)
-                    {
-                        continue;
-                    }
                     float SlopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
                     if (i == 0 && SlopeAngle <= maxSlope)
@@ -95,14 +93,14 @@ namespace ChildOfAtlantis.Mechanics
                         velocity.x = (hit.distance - skinWidth) * directionX;
                         rayLength = (hit.distance);
 
-                        if (collisionInfo.cimbingSlope)
-                        {
-                            velocity.y = Mathf.Tan(collisionInfo.SlopeAngle * Mathf.Deg2Rad * Mathf.Abs(velocity.x));
-                        }
-                        collisionInfo.left = directionX == -1;
-                        collisionInfo.right = directionX == 1;
+                    if (collisionInfo.cimbingSlope)
+                    {
+                        velocity.y = Mathf.Tan(collisionInfo.SlopeAngle * Mathf.Deg2Rad * Mathf.Abs(velocity.x));
                     }
+                    collisionInfo.left = directionX == -1;
+                    collisionInfo.right = directionX == 1;
                 }
+            }
                 Debug.DrawRay(rayOrigin, Vector2.right * directionX);
 
             }
@@ -118,17 +116,6 @@ namespace ChildOfAtlantis.Mechanics
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
                 if (hit)
                 {
-                    if (hit.transform.gameObject.layer == 10) //if layer == fallthrough platform
-                    {
-                        if (directionY == 1 || hit.distance == 0 || collisionInfo.fallingThroughPlatform)
-                            continue;
-                        if (playerInput.y == -1)
-                        {
-                            collisionInfo.fallingThroughPlatform = true;
-                            Invoke("ResetFallingThroughPlatform", 0.25f);
-                            continue;
-                        }
-                    }
                     velocity.y = (hit.distance - skinWidth) * directionY;
 
                     rayLength = (hit.distance);

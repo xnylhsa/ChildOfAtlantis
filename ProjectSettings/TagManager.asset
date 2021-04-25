@@ -8,16 +8,16 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - Ground
   - JumpThroughPlatform
-  - 
-  - 
-  - 
-  - 
-  - 
+  - BuildContainer
+  - Collectable
+  - Enemy
+  - Projectiles
+  - Effects
   - 
   - 
   - 
@@ -44,6 +44,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Collectible
+    uniqueID: 4018837139
+    locked: 0
   - name: Player
     uniqueID: 3190096301
+    locked: 0
+  - name: Effects
+    uniqueID: 243717397
+    locked: 0
+  - name: UI
+    uniqueID: 2145317361
     locked: 0

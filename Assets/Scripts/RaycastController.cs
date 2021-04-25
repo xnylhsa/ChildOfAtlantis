@@ -11,11 +11,10 @@ namespace ChildOfAtlantis.Mechanics
     public class RayCastController : MonoBehaviour
     {
 
-        public BoxCollider2D collider;
+        public BoxCollider2D boxCollider;
+        const float distBetweenRays = 0.005f;
 
-        const float distBetweenRays = 0.05f;
-
-        protected const float skinWidth = 0.015f;
+        protected const float skinWidth = 0.0015f;
         [HideInInspector]
         public int horizontalRayCount = 4;
         public LayerMask collisionMask;
@@ -27,7 +26,7 @@ namespace ChildOfAtlantis.Mechanics
         // Use this for initialization
         protected virtual void Awake()
         {
-            collider = GetComponent<BoxCollider2D>();
+            boxCollider = GetComponent<BoxCollider2D>();
         }
         protected virtual void Start()
         {
@@ -36,7 +35,7 @@ namespace ChildOfAtlantis.Mechanics
         }
         protected void UpdateRayCastOrigin()
         {
-            Bounds bounds = collider.bounds;
+            Bounds bounds = boxCollider.bounds;
             bounds.Expand(skinWidth * -2);
             raycastOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
             raycastOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
@@ -48,7 +47,7 @@ namespace ChildOfAtlantis.Mechanics
         }
         protected void CalculateRaySpacing()
         {
-            Bounds bounds = collider.bounds;
+            Bounds bounds = boxCollider.bounds;
             bounds.Expand(skinWidth * -2);
             float boundsWidth = bounds.size.x;
             float boundsHeight = bounds.size.y;
