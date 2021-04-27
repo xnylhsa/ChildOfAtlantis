@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 namespace ChildOfAtlantis.Mechanics
 {
 
-    [RequireComponent(typeof(Controller2D)), RequireComponent(typeof(SpriteRenderer))]
     public class PlayerController : MonoBehaviour
     {
         /// <summary>
@@ -28,12 +27,12 @@ namespace ChildOfAtlantis.Mechanics
         float knockBackSpeed;
         bool knockedBack = false;
         bool invulnerable = false;
-
+        public Animator animationController;
         [SerializeField]
         int maxHealth = 3;
         int health = 3;
         bool alive = true;
-        protected Controller2D controller;
+        public Controller2D controller;
         [SerializeField]
         float maxJumpHeight = 1.75f;
         [SerializeField]
@@ -76,14 +75,13 @@ namespace ChildOfAtlantis.Mechanics
         bool facingRight = true;
         bool jump;
         Vector2 velocity;
-        SpriteRenderer spriteRenderer;
+        public SpriteRenderer spriteRenderer;
         Collectible nearbyCollectible;
         CollectionContainer nearbyContainer;
         Collectible storedCollectible;
         private void Awake()
         {
             //grab components here.
-            controller = GetComponent<Controller2D>();
             gravity = -(maxJumpHeight * 2 / (timeToApex * timeToApex));
             maxJumpVelocity = timeToApex * Mathf.Abs(gravity);
             minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
@@ -111,6 +109,19 @@ namespace ChildOfAtlantis.Mechanics
             }
             controller.Move(velocity * Time.deltaTime, directionalInput);
             HandleCollisons();
+
+            animationController.SetBool("InWater", inWater && !controller.collisionInfo.below);
+            if (inWater && !controller.collisionInfo.below)
+            {
+                float angle = (Mathf.Atan2(directionalInput.y, directionalInput.x) * Mathf.Rad2Deg) - 90.0f;
+                spriteRenderer.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            }
+            else
+            {
+                spriteRenderer.transform.rotation = Quaternion.AngleAxis(0.0f, Vector3.forward);
+            }
+            animationController.SetBool("IsWalking", directionalInput != Vector2.zero);
+
         }
 
         public bool takeDamage()

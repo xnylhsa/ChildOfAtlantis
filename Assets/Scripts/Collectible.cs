@@ -25,12 +25,16 @@ namespace ChildOfAtlantis.Mechanics
         public void drop()
         {
             spriteRenderer.enabled = true;
-            transform.SetParent(transform.parent.parent);
+            transform.SetParent(transform.parent.parent.parent);
+            Collider2D collider = GetComponent<Collider2D>();
+            collider.enabled = true;
         }
         public void pickUp(GameObject owner)
         {
             spriteRenderer.enabled = false;
-            transform.SetParent(owner.transform); 
+            transform.SetParent(owner.transform);
+            Collider2D collider = GetComponent<Collider2D>();
+            collider.enabled = false;
         }
     }
 
@@ -40,6 +44,12 @@ namespace ChildOfAtlantis.Mechanics
         DashRelic,
         ShipPeice,
         Wood,
+        SeaWeed,
+        Shell,
+        SeaFern,
+        ShipPiece,
+        Metal,
+        Rope,
         MAX
     }
 

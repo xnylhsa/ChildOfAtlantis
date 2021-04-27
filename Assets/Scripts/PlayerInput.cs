@@ -5,7 +5,6 @@ using UnityEngine;
 namespace ChildOfAtlantis.Mechanics
 {
 
-    [RequireComponent(typeof(PlayerController))]
     public class PlayerInput : MonoBehaviour
     {
         public PlayerController player;
@@ -18,7 +17,6 @@ namespace ChildOfAtlantis.Mechanics
         // Start is called before the first frame update
         void Start()
         {
-            player = GetComponent<PlayerController>();
         }
 
         // Update is called once per frame

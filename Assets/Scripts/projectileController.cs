@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ChildOfAtlantis.Mechanics;
-public class projectileController : MonoBehaviour
+public class ProjectileController : MonoBehaviour
 {
     public float projectileSpeed = 1.0f;
     public Vector2 projectileDirection = Vector2.right;

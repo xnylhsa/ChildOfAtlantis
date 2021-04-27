@@ -16,6 +16,10 @@ namespace ChildOfAtlantis.Mechanics
         public float lookSmoothTimeX;
         public float verticalSmoothTime;
         public float minY;
+        public float maxY;
+        public float minX;
+        public float maxX;
+
         float currentLookAheadX;
         float targetLookAheadX;
         float lookAheadDirX;
@@ -57,6 +61,19 @@ namespace ChildOfAtlantis.Mechanics
             {
                 transform.position = new Vector3(transform.position.x, minY + cam.orthographicSize, transform.position.z);
             }
+            else if (transform.position.y + (cam.orthographicSize) > maxY)
+            {
+                transform.position = new Vector3(transform.position.x, maxY - cam.orthographicSize, transform.position.z);
+            }
+
+            if (transform.position.x - (2f * cam.orthographicSize) < minX)
+            {
+                transform.position = new Vector3(minX + (2f * cam.orthographicSize), transform.position.y , transform.position.z);
+            }
+            else if (transform.position.x + (2f * cam.orthographicSize) > maxX)
+            {
+                transform.position = new Vector3(maxX - (2f * cam.orthographicSize), transform.position.y, transform.position.z);
+            }
         }
 
         private void OnDrawGizmos()
@@ -64,6 +81,12 @@ namespace ChildOfAtlantis.Mechanics
             Gizmos.color = new Color(1, 0, 0, 0.5f);
             Gizmos.DrawCube(focusArea.Center, focusAreaSize);
             Gizmos.DrawLine(new Vector3(-100.0f, minY), new Vector3(100.0f, minY));
+
+            Gizmos.DrawLine(new Vector3(minX, -100.0f), new Vector3(minX, 100.0f));
+            Gizmos.DrawLine(new Vector3(-100.0f, maxY), new Vector3(100.0f, maxY));
+            Gizmos.DrawLine(new Vector3(maxX, -100.0f), new Vector3(maxX, 100.0f));
+
+
         }
         // Update is called once per frame
         void Update()

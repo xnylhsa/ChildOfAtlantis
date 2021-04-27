@@ -7,7 +7,6 @@ namespace ChildOfAtlantis.Mechanics
     /// <summary>
     /// Implements game physics for some in game entity.
     /// </summary>
-    [RequireComponent(typeof(BoxCollider2D))]
     public class RayCastController : MonoBehaviour
     {
 
@@ -26,7 +25,7 @@ namespace ChildOfAtlantis.Mechanics
         // Use this for initialization
         protected virtual void Awake()
         {
-            boxCollider = GetComponent<BoxCollider2D>();
+            Debug.Assert(boxCollider);
         }
         protected virtual void Start()
         {

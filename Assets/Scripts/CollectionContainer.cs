@@ -5,29 +5,53 @@ using UnityEngine.UI;
 
 namespace ChildOfAtlantis.Mechanics
 {
-    public class CollectionContainer : MonoBehaviour
+    [System.Serializable]
+    public struct CollectionRequirement
     {
+        public int numberOfNeededCollectibles;
+        public int storedCollectibles;
         public CollectibleType neededCollectible;
-        public int numberOfNeededCollectibles = 3;
-        public int storedCollectibles = 0;
-        public Canvas infoCanvas;
         public Text numberStoredUIText;
         public Text numberStorableUIText;
+    }
+
+    public class CollectionContainer : MonoBehaviour
+    {
+        public List<CollectionRequirement> collectionRequirements;
+
+        public Canvas infoCanvas;
 
         public delegate void AllItemsCollectedEvent();
         public event AllItemsCollectedEvent OnAllItemsCollected;
         // Start is called before the first frame update
         void Start()
         {
-            numberStorableUIText.text = numberOfNeededCollectibles.ToString();
             infoCanvas.gameObject.SetActive(false);
-
         }
 
         // Update is called once per frame
         void Update()
         {
+            bool allItemsStored = true;
             //if has number of need collectibles do cool upgrade stuff here
+            for (int i = 0; i < collectionRequirements.Count; i++)
+            {
+                CollectionRequirement collectionReq = collectionRequirements[i];
+                collectionReq.numberStoredUIText.text = collectionRequirements[i].storedCollectibles.ToString();
+                collectionReq.numberStorableUIText.text = collectionRequirements[i].numberOfNeededCollectibles.ToString();
+
+                collectionRequirements[i] = collectionReq;
+                if (collectionRequirements[i].storedCollectibles < collectionRequirements[i].numberOfNeededCollectibles)
+                {
+                    allItemsStored = false;
+                }
+
+            }
+            if (OnAllItemsCollected != null && allItemsStored)
+            {
+                OnAllItemsCollected();
+                OnAllItemsCollected = null;
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -48,21 +72,23 @@ namespace ChildOfAtlantis.Mechanics
 
         public bool storeCollectible(Collectible collectableToStore)
         {
-            if(collectableToStore.type == neededCollectible && storedCollectibles < numberOfNeededCollectibles)
+            for (int i = 0; i < collectionRequirements.Count; i++)
             {
-                storedCollectibles++;
-                numberStoredUIText.text = storedCollectibles.ToString();
-                Destroy(collectableToStore);
-                if (storedCollectibles >= numberOfNeededCollectibles)
+                if (collectionRequirements[i].neededCollectible == collectableToStore.type && collectionRequirements[i].storedCollectibles < collectionRequirements[i].numberOfNeededCollectibles)
                 {
-                    if (OnAllItemsCollected != null)
-                    {
-                        OnAllItemsCollected();
-                    }
+                    CollectionRequirement collectionReq = collectionRequirements[i];
+                    collectionReq.storedCollectibles++;
+                    collectionRequirements[i] = collectionReq;
+                    collectionRequirements[i].numberStoredUIText.text = collectionRequirements[i].storedCollectibles.ToString();
+                    Destroy(collectableToStore);
+                    return true;
                 }
-                return true;
+
             }
+
             return false;
+
+
         }
     }
 }

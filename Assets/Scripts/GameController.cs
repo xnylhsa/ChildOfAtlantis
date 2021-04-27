@@ -10,8 +10,13 @@ public class GameController : MonoBehaviour
     public RectTransform healthPanel;
     public List<GameObject> heartUIObjects;
     public Image dashCooldownIndicator;
+    public Image shipCompass;
     public CollectionContainer shipBuildLocation;
     public CollectionContainer firstUpgradeLocation;
+    public CollectionContainer finalUpgradeLocation;
+    public GameObject shieldEffect;
+    public GameObject firstProgressGate;
+    public GameObject secondProgressGate;
     int lastPlayerHealth = 0;
     bool lastShieldState = false;
     int buildProgress = 0;
@@ -25,17 +30,31 @@ public class GameController : MonoBehaviour
         }
         dashCooldownIndicator.gameObject.SetActive(player.hasDash);
         lastPlayerHealth = playersHealth;
-        firstUpgradeLocation.gameObject.SetActive(false);
-        firstUpgradeLocation.OnAllItemsCollected += OnAllItemsCollected;
-        shipBuildLocation.OnAllItemsCollected += OnAllItemsCollected;
+        if (firstUpgradeLocation)
+        {
+            firstUpgradeLocation.gameObject.SetActive(false);
+            firstUpgradeLocation.OnAllItemsCollected += OnAllItemsCollected;
+
+        }
+        if (finalUpgradeLocation)
+        {
+            finalUpgradeLocation.gameObject.SetActive(false);
+            finalUpgradeLocation.OnAllItemsCollected += OnAllItemsCollected;
+        }
+        if (shipBuildLocation)
+        {
+            shipBuildLocation.gameObject.SetActive(true);
+            shipBuildLocation.OnAllItemsCollected += OnAllItemsCollected;
+        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(player.hasDash)
+        if (player.hasDash)
         {
-            if(!dashCooldownIndicator.isActiveAndEnabled)
+            if (!dashCooldownIndicator.isActiveAndEnabled)
                 dashCooldownIndicator.gameObject.SetActive(player.hasDash);
             if (playerInputController.dashCooldownTimer <= 0.0f)
             {
@@ -46,25 +65,24 @@ public class GameController : MonoBehaviour
                 dashCooldownIndicator.color = Color.Lerp(Color.black, Color.blue, 1 - (playerInputController.dashCooldownTimer / playerInputController.dashCooldown));
             }
         }
+        if (player.hasShield && player.IsShieldUp() && shieldEffect.activeInHierarchy == false)
+        {
+            shieldEffect.SetActive(true);
+        }
+        else if(!player.hasShield || !player.IsShieldUp())
+        {
+            shieldEffect.SetActive(false);
+        }
         int playersHealth = player.getHealth();
-        bool isShieldUp = player.IsShieldUp();
-        if (playersHealth != lastPlayerHealth || lastShieldState != isShieldUp)
+        if (playersHealth != lastPlayerHealth)
         {
             lastPlayerHealth = playersHealth;
-            lastShieldState = isShieldUp;
+
             for (int i = 0; i < heartUIObjects.Count; i++)
             {
                 if (i < playersHealth)
                 {
                     heartUIObjects[i].SetActive(true);
-                    if (isShieldUp)
-                    {
-                        heartUIObjects[i].GetComponent<Image>().color = Color.cyan;
-                    }
-                    else
-                    {
-                        heartUIObjects[i].GetComponent<Image>().color = Color.red;
-                    }
                 }
                 else if (heartUIObjects[i].activeInHierarchy)
                 {
@@ -72,19 +90,49 @@ public class GameController : MonoBehaviour
                 }
             }
         }
+        if(shipCompass)
+        {
+            Vector3 currentShipPosition;
+            if(buildProgress == 0)
+            {
+                currentShipPosition = shipBuildLocation.transform.position;
+            }
+            else if (buildProgress == 1)
+            {
+                currentShipPosition = firstUpgradeLocation.transform.position;
+            }
+            else 
+            {
+                currentShipPosition = finalUpgradeLocation.transform.position;
+            }
+
+            Vector3 vectorToTarget = currentShipPosition - player.transform.position;
+            float angle = (Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg);
+            shipCompass.rectTransform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
     }
 
     void OnAllItemsCollected()
     {
         if(buildProgress == 0)
         {
-            shipBuildLocation.gameObject.SetActive(false);
-            firstUpgradeLocation.gameObject.SetActive(true);
+            if (shipBuildLocation)
+                shipBuildLocation.gameObject.SetActive(false);
+            if (finalUpgradeLocation)
+                firstUpgradeLocation.gameObject.SetActive(true);
+            if (firstProgressGate)
+                firstProgressGate.gameObject.SetActive(false);
             buildProgress++;
         }
         else if (buildProgress == 1)
         {
-            firstUpgradeLocation.gameObject.SetActive(false);
+            if (shipBuildLocation)
+                firstUpgradeLocation.gameObject.SetActive(false);
+            if (finalUpgradeLocation)
+                finalUpgradeLocation.gameObject.SetActive(true);
+            if (firstProgressGate)
+                secondProgressGate.gameObject.SetActive(false);
+
         }
     }
 }
